@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mansi Wagh - Google Student Ambassador Pitch</title>
+    <!-- Tailwind CSS CDN for easy styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts - Inter for a clean, modern look -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Tone.js for programmatic background music -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.min.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f2f5; /* Light gray background */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .container {
+            width: 95%; /* Slightly wider for better use of space */
+            max-width: 1100px; /* Increased max-width */
+            min-height: 650px; /* Ensure enough height for content */
+            background-color: #ffffff;
+            border-radius: 20px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15); /* More pronounced shadow */
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 30px; /* Increased padding */
+            box-sizing: border-box;
+        }
+        .screen {
+            width: 100%;
+            height: 100%; /* Occupy full height of container */
+            position: absolute;
+            top: 0;
+            left: 0;
+            display: flex;
+            flex-direction: column; /* Arrange content vertically */
+            justify-content: center; /* Center content vertically by default */
+            align-items: center; /* Center content horizontally */
+            transition: opacity 0.7s ease-in-out; /* Slower transition for smoother feel */
+            opacity: 1;
+            visibility: visible;
+            padding: 20px; /* Padding for screen content */
+            padding-bottom: 80px; /* Increased padding-bottom to ensure button visibility */
+            box-sizing: border-box;
+            overflow-y: auto; /* Added for vertical scrolling */
+        }
+        .screen.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none; /* Disable interaction when hidden */
+        }
+
+        /* Intro screen specific animations */
+        .intro-title, .intro-text, .play-button {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+        }
+        .intro-title.active { transition-delay: 0.2s; opacity: 1; transform: translateY(0); }
+        .intro-text.active { transition-delay: 0.4s; opacity: 1; transform: translateY(0); }
+        .play-button.active { transition-delay: 0.6s; opacity: 1; transform: translateY(0); }
+
+
+        .skill-card {
+            opacity: 0;
+            transform: translateY(30px) scale(0.95); /* Initial state for animation */
+            transition: opacity 0.7s ease-out, transform 0.7s ease-out; /* Slower, smoother animation */
+            background-color: #ffffff;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            padding: 25px; /* Increased padding within cards */
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between; /* Distribute space */
+            align-items: center;
+            height: 100%; /* Ensure cards fill grid cell height */
+            box-sizing: border-box;
+        }
+        .skill-card.active {
+            opacity: 1;
+            transform: translateY(0) scale(1); /* Final state for animation */
+        }
+        .skill-card-icon {
+            font-size: 3.5rem; /* Slightly larger icons */
+            margin-bottom: 15px;
+            color: #4285F4; /* Google Blue */
+        }
+        .skill-card-title {
+            font-size: 1.6rem; /* Adjusted font size */
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .skill-card-text {
+            font-size: 1rem; /* Adjusted font size */
+            color: #555;
+            line-height: 1.6;
+            margin-bottom: 15px; /* Space before benefit */
+        }
+        .google-ambassador-benefit {
+            margin-top: auto; /* Pushes benefit to the bottom */
+            padding: 12px 18px; /* Adjusted padding */
+            background-color: #e6f4ea; /* Light green for benefit */
+            border-radius: 10px;
+            font-size: 0.95rem; /* Adjusted font size */
+            color: #1a73e8; /* Google Blue */
+            font-weight: 600;
+            border: 1px solid #c8e6c9;
+            width: 100%; /* Make benefit span full width of card */
+            box-sizing: border-box;
+        }
+        .play-button, .action-button {
+            background-color: #4285F4; /* Google Blue */
+            color: white;
+            padding: 18px 40px;
+            font-size: 1.6rem; /* Slightly smaller for better balance */
+            font-weight: 700;
+            border-radius: 50px;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(66, 133, 244, 0.4);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+            margin-top: 30px; /* Space above buttons */
+            flex-shrink: 0; /* Prevent button from shrinking */
+        }
+        .play-button:hover, .action-button:hover {
+            background-color: #357ae8; /* Darker blue on hover */
+            transform: translateY(-5px); /* More pronounced lift */
+            box-shadow: 0 15px 30px rgba(66, 133, 244, 0.6); /* Stronger shadow on hover */
+        }
+        .play-button:active, .action-button:active {
+            transform: translateY(0);
+            box-shadow: 0 5px 15px rgba(66, 133, 244, 0.3);
+        }
+        .play-button::before, .action-button::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.4s ease, height 0.4s ease;
+            z-index: -1;
+        }
+        .play-button:hover::before, .action-button:hover::before {
+            width: 200%;
+            height: 200%;
+        }
+
+        /* Specific styles for the showcase layout */
+        .showcase-grid {
+            display: grid;
+            grid-template-columns: 1fr; /* Default to single column */
+            gap: 25px; /* Increased gap */
+            width: 100%;
+            padding: 20px;
+            box-sizing: border-box;
+            align-items: stretch; /* Ensure cards stretch to fill height */
+            flex-grow: 1; /* Allow the grid to take up available space in column flex */
+        }
+
+        @media (min-width: 768px) {
+            .showcase-grid {
+                grid-template-columns: repeat(2, 1fr); /* Two columns on medium screens */
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .showcase-grid {
+                grid-template-columns: repeat(2, 1fr); /* Two columns on large screens */
+            }
+        }
+
+        .intro-text, .vision-text {
+            font-size: 1.15rem; /* Adjusted font size */
+            color: #666;
+            margin-bottom: 40px; /* More space */
+            text-align: center;
+            max-width: 700px;
+            line-height: 1.7;
+        }
+        .final-message {
+            font-size: 1.4rem; /* Significantly reduced font size */
+            font-weight: 600; /* Slightly less bold */
+            color: #333;
+            text-align: center;
+            margin-top: 40px; /* More space */
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+            max-width: 800px; /* Constrain width */
+            line-height: 1.7;
+            padding: 0 20px; /* Added horizontal padding for better look */
+            box-sizing: border-box;
+        }
+        .final-message.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .google-logo-final {
+            width: 180px; /* Slightly larger logo */
+            height: auto;
+            margin-top: 30px; /* More space */
+            opacity: 0;
+            transform: scale(0.8);
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+        }
+        .google-logo-final.active {
+            opacity: 1;
+            transform: scale(1);
+        }
+        .section-title {
+            font-size: 2.5rem; /* Large title for sections */
+            font-weight: 800;
+            color: #333;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        /* Styles for female character icons */
+        .character-icons {
+            display: flex;
+            justify-content: center;
+            gap: 20px; /* Space between icons */
+            margin-top: 30px; /* Space below vision text */
+            flex-wrap: wrap; /* Allow wrapping on small screens */
+        }
+        .character-icon {
+            font-size: 4rem; /* Large emoji size */
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+        .character-icon.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Initial "Press Play" Screen -->
+        <div id="introScreen" class="screen">
+            <h1 id="introTitle" class="intro-title text-4xl md:text-5xl font-extrabold text-gray-800 mb-6 text-center">
+                Mansi Wagh: Your Next Google Student Ambassador
+            </h1>
+            <p id="introText" class="intro-text">
+                Ready to see how my skills and passion align perfectly with Google's mission?
+                Press play to experience an interactive showcase of my journey and vision.
+            </p>
+            <button id="playButton" class="play-button">
+                Press Play for an Experience
+            </button>
+        </div>
+
+        <!-- Interactive Skill Showcase Screen -->
+        <div id="skillShowcaseScreen" class="screen hidden">
+            <div class="showcase-grid" id="skillCardsContainer">
+                <!-- Skill Cards will be dynamically added here -->
+            </div>
+            <button id="nextButton" class="action-button hidden">Next: My Vision</button>
+        </div>
+
+        <!-- Vision Screen -->
+        <div id="visionScreen" class="screen hidden">
+            <h2 class="section-title">My Vision for Google on Campus</h2>
+            <p id="visionText" class="vision-text">
+                As a Google Student Ambassador, I envision creating a vibrant, inclusive tech community on campus.
+                I'll organize hands-on workshops on Google Cloud, AI/ML tools, and web development,
+                making these powerful technologies accessible to all students, regardless of their background.
+                My goal is to foster a culture of innovation, collaboration, and continuous learning,
+                empowering peers to build impactful solutions and connect with Google's global network.
+            </p>
+            <div id="characterIconsContainer" class="character-icons">
+                <!-- Female character icons will be added here -->
+            </div>
+            <button id="concludeButton" class="action-button">Conclude Pitch</button>
+        </div>
+
+        <!-- Final Message Screen -->
+        <div id="finalScreen" class="screen hidden">
+            <p id="finalMessage" class="final-message">
+                My unique blend of hands-on experience, problem-solving acumen, and proven leadership makes me not just a deserving candidate, but an *unstoppable force* for spreading Google's mission. Let's make magic happen, together.
+            </p>
+            <img id="googleLogoFinal" src="https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png" alt="Google Logo" class="google-logo-final">
+        </div>
+    </div>
+
+    <script>
+        // Data for the skill cards
+        const skillData = [
+            {
+                icon: '💻', // Emoji for technical skills
+                title: 'Technical Prowess',
+                description: 'From full-stack web development (ReactJS, NodeJS) to cloud infrastructure (AWS EC2, S3, IAM) and databases (MySQL, MongoDB), I speak the language of innovation.',
+                benefit: 'Benefit: Confidently guide peers through Google developer tools and cloud offerings, making complex concepts approachable and exciting.'
+            },
+            {
+                icon: '🚀', // Emoji for real-world impact
+                title: 'Real-World Impact',
+                description: 'Deployed scalable AWS infrastructure (50% manual setup reduction) and built responsive UIs (30% client satisfaction boost). I turn technical skills into tangible results.',
+                benefit: 'Benefit: Lead impactful workshops, showing students how to build real-world projects with Google technologies.'
+            },
+            {
+                icon: '💡', // Emoji for problem-solving & innovation
+                title: 'Problem-Solving & Innovation',
+                description: 'Developed SocialEcho (NLP for 95% accurate content moderation), Trendora (1000+ daily transactions), and MediAI (60% query time reduction). I innovate solutions.',
+                benefit: 'Benefit: Inspire hackathons and ideation sessions, empowering students to build the next big thing with Google\'s AI and machine learning tools.'
+            },
+            {
+                icon: '🏆', // Emoji for leadership & recognition',
+                title: 'Leadership & Recognition',
+                description: 'IT Department Topper (CGPA 9.93), recipient of Persistent Systems and CFI & BNY Mellon Scholarships, and 2nd place in INVENTECH and Code of Clash.',
+                benefit: 'Benefit: Foster a community of driven, Google-powered learners through proven leadership and excellence.'
+            }
+        ];
+
+        // Data for female character icons
+        const characterIconsData = [
+            '👩‍💻', // Woman Technologist
+            '👩‍🏫', // Woman Teacher/Professor (for mentorship)
+            '👩‍🎓', // Woman Student (representing diverse students)
+            '👩‍🔬'  // Woman Scientist (for innovation/research)
+        ];
+
+        // --- Audio Setup ---
+        let synth; // Tone.js synthesizer for background music
+        let audioContext;
+        let clickOscillator; // Web Audio API oscillator for click sound
+
+        async function setupAudio() {
+            // Initialize Tone.js for background music
+            if (!synth) {
+                synth = new Tone.PolySynth(Tone.Synth, {
+                    oscillator: { type: "sine" },
+                    envelope: { attack: 0.005, decay: 0.1, sustain: 0.3, release: 1 },
+                    volume: -20 // Start with a lower volume
+                }).toDestination();
+            }
+
+            // Initialize Web Audio API for click sound
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+        }
+
+        function playBackgroundMusic() {
+            if (synth) {
+                // Play a simple chord progression
+                const now = Tone.now();
+                synth.triggerAttackRelease(["C4", "E4", "G4"], "4n", now);
+                synth.triggerAttackRelease(["F4", "A4", "C5"], "4n", now + 0.5);
+                synth.triggerAttackRelease(["G4", "B4", "D5"], "4n", now + 1);
+                synth.triggerAttackRelease(["C4", "E4", "G4"], "4n", now + 1.5);
+
+                // Loop the music
+                Tone.Transport.scheduleRepeat((time) => {
+                    synth.triggerAttackRelease(["C4", "E4", "G4"], "4n", time);
+                    synth.triggerAttackRelease(["F4", "A4", "C5"], "4n", time + 0.5);
+                    synth.triggerAttackRelease(["G4", "B4", "D5"], "4n", time + 1);
+                    synth.triggerAttackRelease(["C4", "E4", "G4"], "4n", time + 1.5);
+                }, "2s");
+                Tone.Transport.start();
+            }
+        }
+
+        function stopBackgroundMusic() {
+            if (Tone.Transport.state === 'started') {
+                Tone.Transport.stop();
+                Tone.Transport.cancel();
+            }
+        }
+
+        function playClickSound() {
+            if (audioContext) {
+                if (clickOscillator) {
+                    clickOscillator.stop(); // Stop any previous click sound
+                    clickOscillator.disconnect();
+                }
+                clickOscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+
+                clickOscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+
+                clickOscillator.type = 'sine';
+                clickOscillator.frequency.setValueAtTime(440, audioContext.currentTime); // A4 note
+                gainNode.gain.setValueAtTime(0.3, audioContext.currentTime); // Volume
+                gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.1); // Quick fade out
+
+                clickOscillator.start(audioContext.currentTime);
+                clickOscillator.stop(audioContext.currentTime + 0.1);
+            }
+        }
+
+        // --- Gemini API for Voiceovers ---
+        async function speakText(text) {
+            try {
+                // Ensure audio context is resumed for playback if suspended by browser policy
+                if (audioContext && audioContext.state === 'suspended') {
+                    await audioContext.resume();
+                }
+
+                const payload = {
+                    contents: [{ role: "user", parts: [{ text: text }] }],
+                    generationConfig: {
+                        responseMimeType: "audio/mp3" // Requesting audio directly
+                    }
+                };
+                const apiKey = ""; // Canvas will automatically provide this in runtime
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    console.error('Gemini API error:', response.status, response.statusText);
+                    const errorBody = await response.text();
+                    console.error('Error details:', errorBody);
+                    return;
+                }
+
+                const result = await response.json();
+
+                if (result.candidates && result.candidates.length > 0 && result.candidates[0].content && result.candidates[0].content.parts && result.candidates[0].content.parts.length > 0) {
+                    const audioBase64 = result.candidates[0].content.parts[0].text;
+                    const audioUrl = `data:audio/mp3;base64,${audioBase64}`;
+                    const audio = new Audio(audioUrl);
+                    audio.volume = 0.8; // Adjust voiceover volume
+                    audio.play();
+                } else {
+                    console.warn("No audio content received from Gemini API.");
+                }
+            } catch (error) {
+                console.error("Error speaking text with Gemini API:", error);
+            }
+        }
+
+
+        // --- DOM Elements and Event Listeners ---
+        const playButton = document.getElementById('playButton');
+        const introScreen = document.getElementById('introScreen');
+        const skillShowcaseScreen = document.getElementById('skillShowcaseScreen');
+        const visionScreen = document.getElementById('visionScreen');
+        const finalScreen = document.getElementById('finalScreen');
+
+        const skillCardsContainer = document.getElementById('skillCardsContainer');
+        const nextButton = document.getElementById('nextButton');
+        const concludeButton = document.getElementById('concludeButton');
+
+        const finalMessage = document.getElementById('finalMessage');
+        const googleLogoFinal = document.getElementById('googleLogoFinal');
+        const introTitle = document.getElementById('introTitle');
+        const introText = document.getElementById('introText');
+        const visionText = document.getElementById('visionText'); // Get vision text element
+        const characterIconsContainer = document.getElementById('characterIconsContainer'); // Get container for character icons
+
+        // Initial animation for the intro screen elements
+        window.onload = async () => {
+            await setupAudio(); // Setup audio contexts on load
+            introTitle.classList.add('active');
+            introText.classList.add('active');
+            playButton.classList.add('active');
+        };
+
+        playButton.addEventListener('click', async () => {
+            playClickSound();
+            playBackgroundMusic();
+            await speakText("Hello Google! You're looking for someone who doesn't just talk the talk, but walks the code. I'm Mansi Wagh, and I'm ready to bring Google's spirit to life on campus. Let's dive into why I'm your next Google Student Ambassador.");
+
+            // Hide intro screen elements with reverse animation
+            introTitle.classList.remove('active');
+            introText.classList.remove('active');
+            playButton.classList.remove('active');
+
+            // Hide intro screen completely after its elements fade out
+            setTimeout(() => {
+                introScreen.classList.add('hidden');
+
+                // Show skill showcase screen after a slight delay for transition
+                setTimeout(() => {
+                    skillShowcaseScreen.classList.remove('hidden');
+                    startShowcaseAnimation();
+                }, 500); // Matches the CSS transition duration for screen hide
+            }, 800); // Allow intro elements to fade out first
+        });
+
+        function startShowcaseAnimation() {
+            let delay = 0;
+            skillData.forEach((data, index) => {
+                // Create skill card element
+                const card = document.createElement('div');
+                card.classList.add('skill-card');
+
+                card.innerHTML = `
+                    <div class="skill-card-icon">${data.icon}</div>
+                    <div class="skill-card-title">${data.title}</div>
+                    <p class="skill-card-text">${data.description}</p>
+                    <div class="google-ambassador-benefit">${data.benefit}</div>
+                `;
+                skillCardsContainer.appendChild(card);
+
+                // Animate card appearance with a delay
+                setTimeout(() => {
+                    card.classList.add('active');
+                }, delay);
+                delay += 700; // Delay for next card
+            });
+
+            // Show the next button after all cards are displayed
+            setTimeout(() => {
+                nextButton.classList.remove('hidden');
+                nextButton.classList.add('active'); // Add active class for animation
+            }, delay + 500); // Additional delay after last card
+        }
+
+        nextButton.addEventListener('click', async () => {
+            playClickSound();
+            await speakText("Next, let's explore my vision for Google on campus.");
+
+            // Hide skill showcase screen elements
+            skillCardsContainer.querySelectorAll('.skill-card').forEach(card => card.classList.remove('active'));
+            nextButton.classList.remove('active');
+            // Hide the button after its animation
+            setTimeout(() => {
+                nextButton.classList.add('hidden');
+            }, 700);
+
+
+            setTimeout(() => {
+                skillShowcaseScreen.classList.add('hidden');
+                setTimeout(() => {
+                    visionScreen.classList.remove('hidden');
+                    // Trigger animation for vision screen elements
+                    visionScreen.querySelector('.section-title').classList.add('active');
+                    visionText.classList.add('active'); // Activate vision text
+                    startCharacterIconsAnimation(); // Start character icons animation
+                    concludeButton.classList.add('active');
+                }, 500);
+            }, 800); // Allow elements to fade out
+        });
+
+        function startCharacterIconsAnimation() {
+            let delay = 0;
+            characterIconsData.forEach((icon, index) => {
+                const iconElement = document.createElement('span');
+                iconElement.classList.add('character-icon');
+                iconElement.textContent = icon;
+                characterIconsContainer.appendChild(iconElement);
+
+                setTimeout(() => {
+                    iconElement.classList.add('active');
+                }, delay);
+                delay += 200; // Delay for each icon
+            });
+        }
+
+        concludeButton.addEventListener('click', async () => {
+            playClickSound();
+            stopBackgroundMusic(); // Stop music at the end
+            await speakText("My unique blend of hands-on experience, problem-solving acumen, and proven leadership makes me not just a deserving candidate, but an unstoppable force for spreading Google's mission. Let's make magic happen, together.");
+
+            // Hide vision screen elements
+            visionScreen.querySelector('.section-title').classList.remove('active');
+            visionText.classList.remove('active'); // Deactivate vision text
+            characterIconsContainer.querySelectorAll('.character-icon').forEach(icon => icon.classList.remove('active')); // Deactivate character icons
+            concludeButton.classList.remove('active');
+            // Hide the button after its animation
+            setTimeout(() => {
+                concludeButton.classList.add('hidden');
+            }, 700);
+
+
+            setTimeout(() => {
+                visionScreen.classList.add('hidden');
+                setTimeout(() => {
+                    finalScreen.classList.remove('hidden');
+                    finalMessage.classList.add('active');
+                    googleLogoFinal.classList.add('active');
+                }, 500);
+            }, 800); // Allow elements to fade out
+        });
+    </script>
+</body>
+</html>
